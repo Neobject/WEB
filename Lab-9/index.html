@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Activity Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: grid;
+      place-items: center;
+      margin-top: 40px;
+    }
+    .chart-wrapper {
+      width: 90%;
+      max-width: 750px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Статистика дій користувачів</h2>
+  <div class="chart-wrapper">
+    <canvas id="statsCanvas"></canvas>
+  </div>
+
+  <script>
+    async function fetchStatistics() {
+      try {
+        const res = await fetch(
+          "https://lab7-render-6jxa.onrender.com/api/activity/stats"
+        );
+        const stats = await res.json();
+
+        const actionLabels = stats.map(row => row.action);
+        const actionCounts = stats.map(row => row.total);
+
+        drawChart(actionLabels, actionCounts);
+      } catch (err) {
+        console.error("Failed to load chart data:", err);
+      }
+    }
+
+    function drawChart(labels, values) {
+      const ctx = document.getElementById("statsCanvas").getContext("2d");
+      new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [{
+            label: "Кількість подій",
+            data: values,
+            backgroundColor: "rgba(75, 192, 192, 0.6)",
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    fetchStatistics();
+  </script>
+</body>
+</html>
